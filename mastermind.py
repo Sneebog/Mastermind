@@ -5,7 +5,7 @@ import sys
 # inputfile  = sys.argv[1]
 # outputfile = sys.argv[2]
 # codelength = sys.argv[3]
-codelength = 4
+codelength = 3
 #colour dictionary 
 colour_dictionary = ["red", "blue", "yellow", "green", "orange"]
 
@@ -21,7 +21,7 @@ def generatecode(): #create a random code
             code += "green "
         elif colornum == 3:
             code += "yellow "
-        elif colornum == 4:
+        elif colornum == 4: 
             code += "white "
         else:
             code += "purple "
@@ -35,16 +35,12 @@ def valid(code):
             if not (colour in colour_dictionary ):
                 valid = False
     else:
-        valid = False
+        valid= False
 
-    if valid:
-        return code
-    else:
-        return []
+    return valid
 
-def give_feedback(code, guess):
-    guess = valid(guess)
-    if guess != []:
+def give_feedback(code, guess):         
+    if valid(guess):
         colour_pins = [""] * len(guess)#make colour pins list
         colour_set  = [] #to ensure a white peg cant get assigned if colour is already assigned
         for i in range(len(guess)):#loop through the guesses
@@ -109,7 +105,7 @@ def guess(code, mode, guessarray = None,  max_guess = 12): #the main guessing fu
 
 
 
-print(give_feedback(["blue","red", "orange", "yellow"], ["red", "green", "yellow", "yellow"]))
+print(give_feedback(["blue","red", "orange", "yellow"], ["red", "gren", "yellow", "yellow"]))
 
 #code for opening files and outputting them
 
@@ -137,4 +133,4 @@ def mastermind(filearray):
     else:
         print("")
 
-#mastermind(readfile("inputexample1.txt"))
+mastermind(readfile("inputexample1.txt"))
