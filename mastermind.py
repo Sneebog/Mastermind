@@ -56,10 +56,10 @@ def give_feedback(code, guess):
                         colour_set.append(code[j])
 
         colour_pins.sort() # sort so it returns in order of black and white
-        colour_pins = " ".join(colour_pins) #turn it back into a string
+        #colour_pins = " ".join(colour_pins) #turn it back into a string
         return colour_pins # return in 
     else:
-        return " ill-formed guess provided"
+        return "ill-formed guess provided"
 
 def guess(code, mode, guessarray = None,  max_guess = 12): #the main guessing function 
     guess_num = 0
@@ -71,24 +71,29 @@ def guess(code, mode, guessarray = None,  max_guess = 12): #the main guessing fu
             guess_string = input("Enter Guess: ")
             print("")
         elif mode == "human":
-            guess_string = guessarray[guess_num - 1]
+            if guess_num < len(guessarray):
+                guess_string = guessarray[guess_num - 1]
+            else:
+                break
         #elif mode == "computer"
         #   computer(code, feedback)
         guess = guess_string.split()
         feedback = give_feedback(code, guess) #get the feedback from the guess
-        if mode == "test":
-            print("Guess ", guess_num, ":", feedback) #print the feedback
+        if len(feedback) == codelength:
+            feedbackstring = [peg for peg in feedback if peg != ""]
+            feedbackstring = " ".join(feedbackstring)
         else:
-            text = "Guess " + str(guess_num) + ":" + str(feedback) + "\n"
+            feedbackstring = feedback
+        if mode == "test":
+            print("Guess ", guess_num, ": ", feedbackstring) #print the feedback
+        else:
+            text = "Guess " + str(guess_num) + ": " + feedbackstring + "\n"
             file.write(text)
-        feedback = feedback.split() 
-        if len(feedback) == len(code): #check if the feedback is the same length as the the code (Each peg is correct)
-            feedback_flag = True #use flag to check each peg is correct 
-            for peg in feedback: #check that each peg is a black peg
-                if peg != "black":
-                    feedback_flag = False
-            if feedback_flag:
-                solved = True #set to solved to end the loop
+        
+
+        if all(peg == "black" for peg in feedback):
+            solved = True
+
     if mode == "test":
         if solved: #return end statements
             print("You won in ", guess_num, " guesses. Congratulations!")
@@ -99,13 +104,13 @@ def guess(code, mode, guessarray = None,  max_guess = 12): #the main guessing fu
         if solved: #return end statements
             file.write("You won in " + str(guess_num) + " guesses. Congratulations!\n")
         else:
-            file.write("You lost the code was:" + str(code) + "\n")
+            file.write("You lost the code was: " + " ".join(code) + "\n")
         file.write("The game was completed. Further lines were ignored.\n")
     file.close()
 
 
 
-print(give_feedback(["blue","red", "orange", "yellow"], ["red", "gren", "yellow", "yellow"]))
+print(give_feedback(["blue","red", "orange"], ["red", "orange", "orange"]))
 
 #code for opening files and outputting them
 
