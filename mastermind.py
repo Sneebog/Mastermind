@@ -2,29 +2,25 @@ import random
 import sys
 
 # #For a human game
-# inputfile  = sys.argv[1]
-# outputfile = sys.argv[2]
-# codelength = sys.argv[3]
+# num_args = len(sys.argv)
+# if num_args >= 3: 
+#     valid_args = True  
+#     input_file  = sys.argv[1]
+#     output_file = sys.argv[2]
+#     code_length = sys.argv[3]
+# else:
+#     valid_args = False
 codelength = 3
 #colour dictionary 
 colour_dictionary = ["red", "blue", "yellow", "green", "orange"]
 
-def generatecode(): #create a random code
+
+def generateguess(): #create a random code
     code = ""
-    for i in range(4): #for the number of different pins
-        colornum = random.randint(0, 5) # for the random colours
-        if colornum == 0:
-            code += "red "
-        elif colornum == 1:
-            code += "blue "
-        elif colornum == 2:
-            code += "green "
-        elif colornum == 3:
-            code += "yellow "
-        elif colornum == 4: 
-            code += "white "
-        else:
-            code += "purple "
+    for i in range(0, codelength): #for the number of different pins
+        colour_num = random.randint(0, codelength) # for the random colours
+        code += colour_dictionary[colour_num] + " "
+    code = code.split()
     return code
 
 def valid(code):
@@ -35,10 +31,22 @@ def valid(code):
             if not (colour in colour_dictionary ):
                 valid = False
     else:
-        valid= False
-
+        valid = False
     return valid
 
+def valid_file(lines):
+    #check the inputfile is valid
+    if len(lines) > 2:
+        codestring,modestring = lines[0], lines[1]
+        code, mode = codestring.split(), modestring.split()
+        if code[0] == "code" and mode[0] == "player":
+            return True, code, mode
+        else:
+            return False, [], []
+    else:
+        return False, [], []
+
+        
 def give_feedback(code, guess):         
     if valid(guess):
         colour_pins = [""] * len(guess)#make colour pins list
@@ -75,8 +83,9 @@ def guess(code, mode, guessarray = None,  max_guess = 12): #the main guessing fu
                 guess_string = guessarray[guess_num - 1]
             else:
                 break
-        #elif mode == "computer"
-        #   computer(code, feedback)
+        elif mode == "computer":
+          #computer(code, feedback)
+            guess_string = generateguess()
         guess = guess_string.split()
         feedback = give_feedback(code, guess) #get the feedback from the guess
         if len(feedback) == codelength:
@@ -85,15 +94,16 @@ def guess(code, mode, guessarray = None,  max_guess = 12): #the main guessing fu
         else:
             feedbackstring = feedback
         if mode == "test":
-            print("Guess ", guess_num, ": ", feedbackstring) #print the feedback
+            print("Guess ", guess_num, ":", feedbackstring) #print the feedback
         else:
             text = "Guess " + str(guess_num) + ": " + feedbackstring + "\n"
             file.write(text)
         
-
+        #check if the code has been solved
         if all(peg == "black" for peg in feedback):
             solved = True
 
+    #return end statements
     if mode == "test":
         if solved: #return end statements
             print("You won in ", guess_num, " guesses. Congratulations!")
@@ -108,34 +118,35 @@ def guess(code, mode, guessarray = None,  max_guess = 12): #the main guessing fu
         file.write("The game was completed. Further lines were ignored.\n")
     file.close()
 
-
-
-print(give_feedback(["blue","red", "orange"], ["red", "orange", "orange"]))
-
-#code for opening files and outputting them
-
+#code for reading the file
 def readfile(file):
     inputfile = open(file, "r" ) #opens the file
-    filearray = []
-    while True:
-        text = inputfile.readline() #reads a line of the file
-        if text == "": #end of file
-            break
-        else:
-            filearray.append(text.strip()) #adds the line of text to the array and removes the newline
-    inputfile.close() #closes the file
-    return filearray 
-
-
-def mastermind(filearray):
-    codestring,modestring = filearray[0], filearray[1]
-    code, mode = codestring.split(), modestring.split()
-    if code[0] == "code" and mode[0] == "player":
+    lines = [line.strip() for line in inputfile.readlines()]
+    return lines
+   
+def mastermind(lines):
+    is_valid, code, mode = valid_file(lines)
+    if is_valid:
         code = code[1:]
-        mode = mode[1]
-        guessarray = filearray[2:]     
-        guess(code, mode, guessarray)
+        if valid(code):
+            if len(mode) == 2 and (mode[1] == "human" or mode[1] == "computer"):
+                guess_lines = lines[2:]
+                guess(code, mode[1], guess_lines)
+                return 0 #The programme ran successfully
+            else:
+                return 5 #No or ill-formed player provided")
+        else:
+            return 4 #No or ill-formed code provided"
     else:
-        print("")
+        return 2 #There was an issue with the input file       
+    
 
-mastermind(readfile("inputexample1.txt"))
+#print(give_feedback(["blue","red", "orange"], ["red", "orange", "orange"]))
+print(mastermind(readfile("inputexample1.txt")))
+#print(colour_dictionary)
+#guess(generateguess(), "test" )
+# if valid_args:
+#     lines = readfile(input_file)
+#     print(mastermind(lines))
+# else:
+#     print(1) 
