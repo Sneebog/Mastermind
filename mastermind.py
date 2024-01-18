@@ -2,18 +2,25 @@ import random
 import sys
 
 # #For a human game
-# num_args = len(sys.argv)
-# if num_args >= 3: 
-#     valid_args = True  
-#     input_file  = sys.argv[1]
-#     output_file = sys.argv[2]
-#     code_length = sys.argv[3]
-# else:
-#     valid_args = False
+num_args = len(sys.argv)
+print (num_args)
+if num_args >= 4: 
+    valid_args = True  
+    input_file  = sys.argv[1]
+    output_file = sys.argv[2]
+    code_length = sys.argv[3]
+    if num_args > 5:
+        max_guess   = sys.argv[4]
+        if num_args > 6:
+            colours     = sys.argv[5]
+    
+else:
+    valid_args = False
 codelength = 3
-#colour dictionary 
+#colour dictionary
 colour_dictionary = ["red", "blue", "yellow", "green", "orange"]
-
+# if colours != []:
+#     colour_dictionary += colours
 
 def generateguess(): #create a random code
     code = ""
@@ -72,7 +79,8 @@ def give_feedback(code, guess):
 def guess(code, mode, guessarray = None,  max_guess = 12): #the main guessing function 
     guess_num = 0
     solved = False
-    file = open("outputfile", "w")
+    #file = open("outputfile", "w")
+    file = open(output_file, "w")
     while guess_num != max_guess and not solved: #loop until the maximum guesses are reached and until it is solved
         guess_num += 1 #increment the guess number 
         if mode == "test":
@@ -124,29 +132,27 @@ def readfile(file):
     lines = [line.strip() for line in inputfile.readlines()]
     return lines
    
-def mastermind(lines):
-    is_valid, code, mode = valid_file(lines)
-    if is_valid:
-        code = code[1:]
-        if valid(code):
-            if len(mode) == 2 and (mode[1] == "human" or mode[1] == "computer"):
-                guess_lines = lines[2:]
-                guess(code, mode[1], guess_lines)
-                return 0 #The programme ran successfully
+def mastermind(valid_args):
+    if valid_args:
+        lines = readfile(input_file)
+        is_valid, code, mode = valid_file(lines)
+        if is_valid:
+            code = code[1:]
+            if valid(code):
+                if len(mode) == 2 and (mode[1] == "human" or mode[1] == "computer"):
+                    guess_lines = lines[2:]
+                    guess(code, mode[1], guess_lines)
+                    return 0 #The programme ran successfully
+                else:
+                    return 5 #No or ill-formed player provided")
             else:
-                return 5 #No or ill-formed player provided")
+                return 4 #No or ill-formed code provided"
         else:
-            return 4 #No or ill-formed code provided"
+            return 2 #There was an issue with the input file       
     else:
-        return 2 #There was an issue with the input file       
-    
+        return 1 #Not enough programme arguments provided
 
-#print(give_feedback(["blue","red", "orange"], ["red", "orange", "orange"]))
-print(mastermind(readfile("inputexample1.txt")))
+#print(give_feedback(["blue","red", "orange"], ["red", "orange", "orange"]))print(mastermind(readfile("inputexample1.txt")))
 #print(colour_dictionary)
 #guess(generateguess(), "test" )
-# if valid_args:
-#     lines = readfile(input_file)
-#     print(mastermind(lines))
-# else:
-#     print(1) 
+print(mastermind(valid_args))
